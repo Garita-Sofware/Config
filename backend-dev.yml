@@ -1,0 +1,6 @@
+Spring:
+  Application:
+    Name: backend
+MongoDbSettings:
+  ConnectionString: mongodb+srv://alberthgr1414:ajgr1095@cluster.cy3x4kq.mongodb.net/?retryWrites=true&w=majority
+  DatabaseName: configuration
