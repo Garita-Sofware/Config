@@ -1,0 +1,146 @@
+Spring:
+  Application:
+    Name: impresion
+MongoDbSettings:
+  ConnectionString: mongodb+srv://sandbox2:Lw84YBCo638sW5mL@uat.gnd1i.mongodb.net/Originacion?retryWrites=true&w=majority
+  DatabaseName: Originacion
+BackendSetting:
+  BaseUrl: http://172.29.115.124/
+  AppKey: impresion-
+  RequestTimeOut: 3600
+EnvironmentSettings:
+  Tenant: 643d673349c17a59cb031623
+  Country: mx
+GeneralSettings:
+  TurnOnUATMail: 0
+  UpdateLog: true
+  UpdateLogistica: true
+  AutomaticTransfer: false
+  AutomaticActivation: false
+ProviderSettings:
+  Incode:
+    GlobalCode: 4
+    BaseUrl: https://saas-api.incodesmile.com/
+    ApiVersion: 1.0
+    ApiKey: abcff3be9b8e5cd5a518c3aa91337928e6e26b28
+    TimeOut: 3600
+    Retry: 3
+    RetrySecondsSleep: 5
+  BBVA:
+    GlobalCode: 5
+ApiServices:
+  Solicitudes:
+    BaseUrl: http://transactionapigateway.gateway.svc.cluster.local/
+    TimeOut: 3600
+    Retry: 3
+    RetrySecondsSleep: 5
+  DocumentGenerator:
+    BaseUrl: http://172.29.0.8:8016/
+    ImpresionController: api/GetPdfPlantilla/{0}/{1}/{2}/{3}
+    TimeOut: 3600
+    Retry: 3
+    RetrySecondsSleep: 5
+  Transactions:
+    BaseUrl: http://transactionsapi.common.svc.cluster.local/
+    TimeOut: 3600
+    Retry: 3
+    RetrySecondsSleep: 5
+RabbitMqSettings:
+  VirtualHosts:
+  - RabbitMqUri: amqp://user:dNJw63timL@my-rabbitmq.k8rabbit.svc.cluster.local:5672
+    ConnectionName: Sinpe
+    Routes:
+    - Process: TransferSend
+      Exchange: akros.sinpe.transferencias
+      RoutingKey: akros.sinpe.*
+      Type: topic
+      Queue: akros.sinpe.transferencias
+      Enable: false
+      Producer: true
+  - RabbitMqUri: amqp://user:dNJw63timL@my-rabbitmq.k8rabbit.svc.cluster.local:5672/transactions
+    ConnectionName: Transactions
+    Routes:
+    - Process: DocumentLoad
+      Exchange: sign.events
+      RoutingKey: "*.events.documents"
+      Type: topic
+      Queue: sign.events.documents
+      Enable: true
+      Producer: false
+    - Process: DocumentSign
+      Exchange: sign.events
+      RoutingKey: "*.documents"
+      Type: topic
+      Queue: sign-documents
+      Enable: true
+      Producer: false
+    - Process: AutomaticActivation
+      Exchange: sign.events
+      RoutingKey: "*.automatic_activation"
+      Type: topic
+      Queue: queue.automatic_activation
+      Enable: true
+      Producer: false
+    - Process: TransferCheck
+      Exchange: sign.events
+      RoutingKey: "*.transfer_check"
+      Type: topic
+      Queue: transfer_check
+      Enable: false
+      Producer: false
+    - Process: DocumentSingOff
+      Exchange: sign.events
+      RoutingKey: "*.sign_off"
+      Type: topic
+      Queue: queue.circulo-credito.sign_off
+      Enable: true
+      Producer: true
+    - Process: DocumentError
+      Exchange: sign.events
+      RoutingKey: "*.sign_error"
+      Type: topic
+      Queue: sign_process_error
+      Enable: true
+      Producer: true
+    - Process: DocumentReprocess
+      Exchange: sign.events
+      RoutingKey: "*.sign_reprocess"
+      Type: topic
+      Queue: queue.sign_reprocess
+      Enable: true
+      Producer: true
+    - Process: TransferVoucher
+      Exchange: sign.events
+      RoutingKey: "*.transfer_voucher"
+      Type: topic
+      Queue: transfer_voucher
+      Enable: false
+      Producer: false
+Environments:
+- key: PRD
+  Tenant: 643d673349c17a59cb031623
+Schedules:
+- Id: TransferCheckJob
+  Schedule: "*/10 * * ? * *"
+  Enable: false
+  Environments:
+  - PRD
+  Countries:
+  - mx
+Serilog:
+  MinimumLevel:
+    Default: Information
+    Override:
+      Microsoft: Warning
+      System: Warning
+      System.Net.Http.HttpClient: Information
+  WriteTo:
+  - Name: Console
+    Args:
+      theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console
+      outputTemplate: "[{Timestamp:HH:mm:ss}] [{Level:u3}] {Message:lj} <{SourceContext}>{NewLine}{Exception}"
+  Enrich:
+    - FromLogContext
+    - WithMachineName
+  Properties:
+    ApplicationName: Impresion
