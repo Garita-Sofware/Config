@@ -1,6 +1,41 @@
 Spring:
   Application:
     Name: backend
+ConnectionStrings:
+  Core: data source=prd.sytes.net;User ID=sa;Password=123456;Connection Timeout=30;Pooling=true;Initial
+    Catalog=CORE;Application Name=CORE;Encrypt=False;TrustServerCertificate=False;
 MongoDbSettings:
-  ConnectionString: mongodb+srv://alberthgr1414:ajgr1095@cluster.cy3x4kq.mongodb.net/?retryWrites=true&w=majority
-  DatabaseName: configuration
+  ConnectionString: mongodb+srv://user:Abc..123@mongo-dev.aristb5.mongodb.net/Core?retryWrites=true&w=majority
+  DatabaseName: Core
+rabbit:
+  RabbitMqUri: amqp://admin:Abc..123@rabbitmq:5672/core
+  ConnectionName: core
+  Routes: []
+ProviderSettings:
+  Hacienda:
+    BaseUrl: https://idp.comprobanteselectronicos.go.cr
+    TokenController: "/auth/realms/rut-stag/protocol/openid-connect/token"
+    ClientId: api-stag
+    Username: cpf-01-1555-0985@stag.comprobanteselectronicos.go.cr
+    Password: Aa#i%EI|VZV:>=Yo_3Fx
+    GrantType: password
+    TimeOut: '120'
+Serilog:
+  MinimumLevel:
+    Default: Debug
+    Override:
+      Microsoft: Warning
+      System: Information
+      Microsoft.Hosting.Lifetime: Information
+      System.Net.Http.HttpClient: Information
+      Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware: Error
+  WriteTo:
+  - Name: Console
+    Args:
+      theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console
+      outputTemplate: "[{Timestamp:yyyy-MM-dd}][{Timestamp:HH:mm:ss}][{Level:u3}]{Message:lj}<s:{SourceContext}>{NewLine}{Exception}"
+  Enrich:
+  - FromLogContext
+  - WithMachineName
+  Properties:
+    ApplicationName: backend-api
