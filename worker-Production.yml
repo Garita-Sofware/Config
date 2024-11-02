@@ -1,0 +1,35 @@
+Spring:
+  Application:
+    Name: worker
+Environments:
+- key: DEV001
+  Tenant: 6584506dd84ad16504c73df7
+Schedules:
+- Id: ExchangeRateJob
+  Schedule: "*/10 * * ? * *"
+  Enable: true
+  Environments:
+  - DEV001
+  Countries:
+  - rg
+Serilog:
+  MinimumLevel:
+    Default: Information
+    Override:
+      Microsoft: Warning
+      System: Information
+      Microsoft.Hosting.Lifetime: Information
+      System.Net.Http.HttpClient: Information
+      Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware: Error
+      Microsoft.EntityFrameworkCore: Error
+  WriteTo:
+  - Name: Console
+    Args:
+      theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console
+      outputTemplate: "[{Timestamp:dd-MM}][{Timestamp:HH:mm:ss}][{Level:u3}] {Message:lj}
+        <s:{SourceContext}>{NewLine}{Exception}"
+  Enrich:
+  - FromLogContext
+  - WithMachineName
+  Properties:
+    ApplicationName: worker
