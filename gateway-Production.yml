@@ -1,0 +1,12 @@
+Routes:
+- DownstreamPathTemplate: "/echo"
+  DownstreamScheme: http
+  DownstreamHostAndPorts:
+  - Host: backend.app.svc.cluster.local
+    Port: 80
+  UpstreamPathTemplate: "/echo"
+  UpstreamHttpMethod:
+  - POST
+  - PUT
+  - GET
+GlobalConfiguration: {}
