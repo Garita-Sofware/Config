@@ -9,12 +9,12 @@ Routes:
   - POST
   - PUT
   - GET
-- DownstreamPathTemplate: "/api/{version}/Invoice/Token"
+- DownstreamPathTemplate: "/api/v{version}/Invoice/Token"
   DownstreamScheme: http
   DownstreamHostAndPorts:
   - Host: backend.app.svc.cluster.local
     Port: 80
-  UpstreamPathTemplate: "/api/{version}/Invoice/Token"
+  UpstreamPathTemplate: "/api/v{version}/Invoice/Token"
   UpstreamHttpMethod:
   - POST
   - PUT
